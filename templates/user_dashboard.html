@@ -1,0 +1,369 @@
+{% extends "base.html" %}
+
+{% block title %}My Dashboard - Star Vehicle PRO{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard {
+        padding: 3rem 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .dashboard-header {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        border-radius: 24px;
+        padding: 2.5rem;
+        color: var(--white);
+        margin-bottom: 2.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+
+    .dashboard-header h1 {
+        font-size: 1.8rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .dashboard-header p { opacity: 0.85; }
+
+    .dashboard-header .user-avatar {
+        width: 70px; height: 70px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .stat-card {
+        background: var(--white);
+        border-radius: 20px;
+        padding: 1.8rem;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+        border: 1px solid rgba(0,0,0,0.04);
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+    }
+
+    .stat-icon {
+        width: 55px; height: 55px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+    }
+
+    .stat-icon.blue { background: rgba(26,115,232,0.1); color: var(--primary); }
+    .stat-icon.green { background: rgba(0,200,83,0.1); color: var(--secondary); }
+    .stat-icon.orange { background: rgba(255,109,0,0.1); color: var(--accent); }
+
+    .stat-info h3 {
+        font-size: 1.6rem;
+        color: var(--dark);
+        margin-bottom: 0.2rem;
+    }
+
+    .stat-info p {
+        color: var(--gray);
+        font-size: 0.9rem;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .section-header h2 {
+        font-size: 1.4rem;
+        color: var(--dark);
+    }
+
+    .btn-sm {
+        padding: 10px 22px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .btn-green {
+        background: var(--secondary);
+        color: var(--white);
+    }
+
+    .btn-green:hover {
+        background: #00a344;
+        transform: translateY(-2px);
+    }
+
+    .btn-blue {
+        background: var(--primary);
+        color: var(--white);
+    }
+
+    .btn-blue:hover {
+        background: var(--primary-dark);
+    }
+
+    .btn-red {
+        background: var(--danger);
+        color: var(--white);
+    }
+
+    .btn-red:hover { background: #c82333; }
+
+    .vehicles-table-container {
+        background: var(--white);
+        border-radius: 20px;
+        padding: 1.5rem;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+        border: 1px solid rgba(0,0,0,0.04);
+        overflow-x: auto;
+    }
+
+    .vehicles-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .vehicles-table th {
+        text-align: left;
+        padding: 1rem;
+        font-weight: 600;
+        color: var(--gray);
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .vehicles-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #f5f5f5;
+        font-size: 0.95rem;
+    }
+
+    .vehicles-table tr:hover { background: #fafbfc; }
+
+    .status-badge {
+        padding: 5px 14px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .status-available { background: #d4edda; color: #155724; }
+    .status-sold { background: #f8d7da; color: #721c24; }
+
+    .actions { display: flex; gap: 8px; }
+
+    .no-data {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--gray);
+    }
+
+    .no-data i {
+        font-size: 3.5rem;
+        margin-bottom: 1rem;
+        opacity: 0.3;
+        color: var(--primary);
+    }
+
+    .no-data h3 { margin-bottom: 0.5rem; color: var(--dark); }
+
+    .profile-card {
+        background: var(--white);
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+        border: 1px solid rgba(0,0,0,0.04);
+        margin-bottom: 2rem;
+    }
+
+    .profile-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .profile-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .profile-item i {
+        width: 45px; height: 45px;
+        background: rgba(26,115,232,0.1);
+        color: var(--primary);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+    }
+
+    .profile-item div p:first-child {
+        font-size: 0.8rem;
+        color: var(--gray);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .profile-item div p:last-child {
+        font-weight: 600;
+        color: var(--dark);
+    }
+
+    @media (max-width: 768px) {
+        .dashboard { padding: 1.5rem 1rem; }
+        .dashboard-header { padding: 1.5rem; }
+        .vehicles-table th, .vehicles-table td { padding: 0.8rem; font-size: 0.85rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <div>
+            <h1><i class="fas fa-user-circle"></i> Welcome, {{ user.full_name }}</h1>
+            <p>Manage your vehicles and profile from here</p>
+        </div>
+        <div class="user-avatar"><i class="fas fa-user"></i></div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon blue"><i class="fas fa-car"></i></div>
+            <div class="stat-info">
+                <h3>{{ vehicles|length }}</h3>
+                <p>My Listings</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-info">
+                <h3>{{ vehicles|selectattr('status', 'equalto', 'available')|list|length }}</h3>
+                <p>Active</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon orange"><i class="fas fa-calendar-alt"></i></div>
+            <div class="stat-info">
+                <h3>{{ user.created_at[:10] }}</h3>
+                <p>Member Since</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="profile-card">
+        <div class="section-header">
+            <h2><i class="fas fa-id-card"></i> My Profile</h2>
+            <a href="{{ url_for('edit_profile') }}" class="btn-sm btn-blue"><i class="fas fa-edit"></i> Edit Profile</a>
+        </div>
+        <div class="profile-info">
+            <div class="profile-item">
+                <i class="fas fa-user"></i>
+                <div>
+                    <p>Full Name</p>
+                    <p>{{ user.full_name }}</p>
+                </div>
+            </div>
+            <div class="profile-item">
+                <i class="fas fa-envelope"></i>
+                <div>
+                    <p>Email</p>
+                    <p>{{ user.email }}</p>
+                </div>
+            </div>
+            <div class="profile-item">
+                <i class="fas fa-phone"></i>
+                <div>
+                    <p>Phone</p>
+                    <p>{{ user.phone }}</p>
+                </div>
+            </div>
+            <div class="profile-item">
+                <i class="fas fa-shield-alt"></i>
+                <div>
+                    <p>Role</p>
+                    <p>{{ user.role|title }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-header">
+        <h2><i class="fas fa-car"></i> My Vehicles</h2>
+        <a href="{{ url_for('add_vehicle') }}" class="btn-sm btn-green"><i class="fas fa-plus"></i> Add Vehicle</a>
+    </div>
+
+    {% if vehicles %}
+    <div class="vehicles-table-container">
+        <table class="vehicles-table">
+            <thead>
+                <tr>
+                    <th>Vehicle</th>
+                    <th>Brand/Model</th>
+                    <th>Year</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th>Listed</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for v in vehicles %}
+                <tr>
+                    <td><strong>{{ v.title }}</strong></td>
+                    <td>{{ v.brand }} {{ v.model }}</td>
+                    <td>{{ v.year }}</td>
+                    <td><strong style="color:var(--primary);">${{ "{:,.0f}".format(v.price) }}</strong></td>
+                    <td><span class="status-badge status-{{ v.status }}">{{ v.status }}</span></td>
+                    <td>{{ v.created_at[:10] }}</td>
+                    <td class="actions">
+                        <a href="{{ url_for('vehicle_detail', vehicle_id=v.id) }}" class="btn-sm btn-blue" style="padding:6px 14px;font-size:0.8rem;"><i class="fas fa-eye"></i></a>
+                        <a href="{{ url_for('delete_vehicle', vehicle_id=v.id) }}" class="btn-sm btn-red" style="padding:6px 14px;font-size:0.8rem;" onclick="return confirm('Delete this vehicle?')"><i class="fas fa-trash"></i></a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="no-data">
+        <i class="fas fa-car-side"></i>
+        <h3>No vehicles listed yet</h3>
+        <p>Start by adding your first vehicle listing</p>
+        <a href="{{ url_for('add_vehicle') }}" class="btn-sm btn-green" style="margin-top:1rem;"><i class="fas fa-plus"></i> Add Your First Vehicle</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
